@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title></title>
+</head>
+
+<body>
+  
+</body>
+
+</html><!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Apps - المتجر الذكي المتكامل</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
+        body { font-family: 'Cairo', sans-serif; background-color: #09090b; color: #f4f4f5; }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: #09090b; }
+        ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+    </style>
+</head>
+<body id="bodyRoot" class="min-h-screen pb-24 select-none">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-zinc-950/80 backdrop-blur-md border-b border-zinc-800/80 px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-2.5 cursor-pointer" onclick="handleLogoClick()">
+            <div id="headerLogoBg" class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                <i class="fa-solid fa-cube text-zinc-950 font-black text-lg"></i>
+            </div>
+            <div>
+                <h1 id="storeTitleText" class="text-sm font-black tracking-wide text-zinc-100">Nexus Apps</h1>
+                <p class="text-[10px] text-zinc-400 font-semibold">منصة التطبيقات الذكية</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <button onclick="switchTab('updates')" class="relative p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-cyan-400 text-xs transition-colors" title="فحص التحديثات">
+                <i class="fa-solid fa-rotate"></i>
+                <span id="updatesBadge" class="absolute -top-1 -right-1 bg-cyan-500 text-zinc-950 text-[9px] font-black w-3.5 h-3.5 rounded-full flex items-center justify-center hidden">0</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-md mx-auto p-4 space-y-4">
+
+        <!-- TAB: STORE -->
+        <section id="tab-store" class="space-y-4">
+            <!-- Search & Filters -->
+            <div class="space-y-2">
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-500 text-xs"></i>
+                    <input type="text" id="searchInput" oninput="filterApps()" placeholder="ابحث عن تطبيق، أداة، أو حزمة..." class="w-full bg-zinc-900 border border-zinc-800/80 rounded-2xl py-2.5 pr-10 pl-4 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-cyan-500 transition-colors">
+                </div>
+                <!-- Dynamic Categories Bar -->
+                <div id="categoriesFilterBar" class="flex gap-2 overflow-x-auto pb-1 text-xs">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Apps List -->
+            <div id="appsList" class="space-y-3"></div>
+        </section>
+
+        <!-- TAB: DOWNLOADS & QUEUE -->
+        <section id="tab-downloads" class="hidden space-y-4">
+            <h2 class="text-sm font-black text-zinc-200 flex items-center gap-2">
+                <i class="fa-solid fa-download text-cyan-400"></i> إدارة التحميلات والتثبيتات
+            </h2>
+            <div id="queueContainer" class="space-y-2"></div>
+            <div class="border-t border-zinc-800/80 pt-3 space-y-3">
+                <h3 class="text-xs font-bold text-zinc-400">التطبيقات التي تم تحميلها</h3>
+                <div id="downloadsList" class="space-y-3"></div>
+            </div>
+        </section>
+
+        <!-- TAB: UPDATES SCANNER -->
+        <section id="tab-updates" class="hidden space-y-4">
+            <div class="bg-zinc-900/60 border border-zinc-800 p-4 rounded-2xl space-y-3 text-center">
+                <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 text-cyan-400 mx-auto flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-shield-virus"></i>
+                </div>
+                <h2 class="text-xs font-black text-zinc-100">فحص تحديثات النظام والتطبيقات</h2>
+                <p class="text-[10px] text-zinc-400">تحقق من توفر أحدث إصدارات APK وتصحيحات الأمان لجهازك.</p>
+                <button onclick="scanForUpdates()" class="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-bold text-xs py-2.5 rounded-xl transition-all">بدء والفحص الشامل</button>
+            </div>
+            <div id="updatesList" class="space-y-3"></div>
+        </section>
+
+        <!-- TAB: FAVORITES -->
+        <section id="tab-favorites" class="hidden space-y-4">
+            <h2 class="text-sm font-black text-zinc-200 flex items-center gap-2">
+                <i class="fa-solid fa-heart text-rose-500"></i> قائمة المفضلة
+            </h2>
+            <div id="favoritesList" class="space-y-3"></div>
+        </section>
+
+        <!-- TAB: ADMIN 1 (App publishing & security) -->
+        <section id="tab-admin" class="hidden space-y-4">
+            <div class="bg-zinc-900/60 border border-zinc-800 p-4 rounded-2xl space-y-5">
+                <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+                    <h2 class="text-xs font-black text-cyan-400 flex items-center gap-2">
+                        <i class="fa-solid fa-screwdriver-wrench"></i> لوحة التحكم المركزية الأولى
+                    </h2>
+                    <button onclick="switchTab('store')" class="text-zinc-400 hover:text-zinc-200 text-xs"><i class="fa-solid fa-xmark"></i> إغلاق</button>
+                </div>
+
+                <!-- Add App Form -->
+                <form id="addAppForm" onsubmit="handleAddNewApp(event)" class="space-y-3">
+                    <h3 class="text-xs font-bold text-cyan-400 flex items-center gap-2">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> نشر تطبيق جديد مع ملف APK حقيقي
+                    </h3>
+                    <div class="space-y-1">
+                        <label class="text-[11px] font-bold text-zinc-300">اسم التطبيق</label>
+                        <input type="text" id="newAppName" required placeholder="مثال: Nexus Optimizer Pro" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2 px-3 text-xs text-zinc-200 focus:outline-none">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="space-y-1">
+                            <label class="text-[11px] font-bold text-zinc-300">التصنيف (القائمة)</label>
+                            <select id="newAppCategory" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2 px-3 text-xs text-zinc-200 focus:outline-none">
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[11px] font-bold text-zinc-300">رقم الإصدار</label>
+                            <input type="text" id="newAppVersion" required value="1.0.0" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2 px-3 text-xs text-zinc-200">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="space-y-1">
+                            <label class="text-[11px] font-bold text-zinc-300">حجم التطبيق</label>
+                            <input type="text" id="newAppSize" required placeholder="18.5 MB" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2 px-3 text-xs text-zinc-200">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[11px] font-bold text-zinc-300">أندرويد الأدنى</label>
+                            <input type="text" id="newAppMinAndroid" required value="Android 8.0+" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2 px-3 text-xs text-zinc-200">
+                        </div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-[11px] font-bold text-zinc-300">معرف الحزمة (Package Name)</label>
+                        <input type="text" id="newAppPackage" required placeholder="com.nexus.app" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2 px-3 text-xs text-zinc-200 font-mono">
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-[11px] font-bold text-zinc-300">أيقونة التطبيق (الغلاف)</label>
+                        <input type="file" id="newAppImage" accept="image/*" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-1.5 px-3 text-xs text-zinc-400 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-zinc-800 file:text-zinc-200 cursor-pointer">
+                    </div>
+
+                    <div class="space-y-1 border border-cyan-500/30 p-2.5 rounded-xl bg-cyan-950/10">
+                        <label class="text-[11px] font-extrabold text-cyan-400 flex items-center gap-1.5">
+                            <i class="fa-solid fa-file-arrow-down"></i> ملف APK الحقيقي للتنزيل
+                        </label>
+                        <input type="file" id="newAppFile" accept=".apk,.zip" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-1.5 px-3 text-xs text-zinc-400 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-cyan-500 file:text-zinc-950 cursor-pointer">
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-[11px] font-bold text-zinc-300">صور توضيحية (Screenshots)</label>
+                        <input type="file" id="newAppScreenshots" accept="image/*" multiple class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-1.5 px-3 text-xs text-zinc-400 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-zinc-800 file:text-zinc-200 cursor-pointer">
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-[11px] font-bold text-zinc-300">وصف التطبيق</label>
+                        <textarea id="newAppDesc" rows="3" required placeholder="اكتب وصفاً تفصيلياً..." class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2 px-3 text-xs text-zinc-200 focus:outline-none"></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-400 text-zinc-950 font-black text-xs py-3 rounded-xl transition-all shadow-lg shadow-cyan-500/20">
+                        نشر التطبيق فوراً في المتجر
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- TAB: ADMIN 2 (Password Protected - حقل فارغ ومخفي تماماً) -->
+        <section id="tab-admin-design" class="hidden space-y-4">
+            <!-- Password Gate -->
+            <div id="admin2LoginBox" class="bg-zinc-900/60 border border-indigo-500/40 p-5 rounded-2xl space-y-4 text-center">
+                <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-400 mx-auto flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <div>
+                    <h2 class="text-sm font-black text-zinc-100">لوحة التحكم الثانية (التصميم والقوائم)</h2>
+                    <p class="text-[10px] text-zinc-400 mt-1">الرجاء إدخال كلمة المرور المطلوبة للوصول إلى خيارات التعديل.</p>
+                </div>
+                <div class="space-y-2">
+                    <!-- تم جعل الحقل فارغاً ومخفياً تماماً type="password" دون إظهار كلمة السر مسبقاً -->
+                    <input type="password" id="admin2PasswordInput" placeholder="أدخل كلمة المرور" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-2.5 px-3 text-xs text-zinc-200 text-center focus:outline-none focus:border-indigo-500" value="">
+                    
+                    <button onclick="verifyAdmin2Password()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-2.5 rounded-xl transition-all">
+                        دخول للوحة التحكم
+                    </button>
+                </div>
+                <button onclick="switchTab('store')" class="text-xs text-zinc-500 hover:text-zinc-300">إلغاء والعودة للمتجر</button>
+            </div>
+
+            <!-- Actual Dashboard Panel (Hidden until correct password entered) -->
+            <div id="admin2ContentBox" class="bg-zinc-900/60 border border-indigo-500/40 p-4 rounded-2xl space-y-5 hidden">
+                <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+                    <h2 class="text-xs font-black text-indigo-400 flex items-center gap-2">
+                        <i class="fa-solid fa-palette"></i> إعدادات تصميم وقوائم المتجر الثانية
+                    </h2>
+                    <button onclick="switchTab('store')" class="text-zinc-400 hover:text-zinc-200 text-xs"><i class="fa-solid fa-xmark"></i> إغلاق</button>
+                </div>
+
+                <!-- Sub-section: Store Branding / Styling -->
+                <div class="bg-zinc-950/60 border border-zinc-800 p-3.5 rounded-xl space-y-3">
+                    <h3 class="text-xs font-bold text-zinc-300 flex items-center gap-2">
+                        <i class="fa-solid fa-paint-brush text-cyan-400"></i> تعديل تصميم وتسمية المتجر
+                    </h3>
+                    <div class="space-y-2">
+                        <div>
+                            <label class="text-[10px] text-zinc-400 font-semibold">اسم المتجر الرئيسي</label>
+                            <input type="text" id="designStoreTitle" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl py-2 px-3 text-xs text-zinc-200" value="Nexus Apps">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-zinc-400 font-semibold">شكل حواف البطاقات</label>
+                            <select id="designBorderRadius" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl py-2 px-3 text-xs text-zinc-200">
+                                <option value="rounded-2xl">حواف دائرية متوسطة (2xl)</option>
+                                <option value="rounded-3xl">حواف دائرية كبيرة (3xl)</option>
+                                <option value="rounded-xl">حواف حادة قليلاً (xl)</option>
+                            </select>
+                        </div>
+                        <button onclick="saveStoreDesignSettings()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-2.5 rounded-xl transition-all">
+                            حفظ وتطبيق التصميم الجديد
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sub-section: Categories / Menus Management -->
+                <div class="bg-zinc-950/60 border border-zinc-800 p-3.5 rounded-xl space-y-3">
+                    <h3 class="text-xs font-bold text-zinc-300 flex items-center gap-2">
+                        <i class="fa-solid fa-list text-emerald-400"></i> إضافة وإدارة قوائم وتصنيفات التطبيقات
+                    </h3>
+                    <div class="space-y-2">
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[10px] text-zinc-400 font-semibold">معرف القائمة (إنجليزية بدون مسافات)</label>
+                                <input type="text" id="newCatId" placeholder="مثال: games" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl py-2 px-3 text-xs text-zinc-200 font-mono">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-zinc-400 font-semibold">اسم القائمة الظاهر بالعربية</label>
+                                <input type="text" id="newCatName" placeholder="مثال: ألعاب فيديو" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl py-2 px-3 text-xs text-zinc-200">
+                            </div>
+                        </div>
+                        <button onclick="addNewCategory()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-zinc-950 font-bold text-xs py-2.5 rounded-xl transition-all text-white">
+                            إضافة قائمة جديدة للمتجر
+                        </button>
+                    </div>
+
+                    <!-- Existing Categories List -->
+                    <div class="pt-2 border-t border-zinc-800 space-y-1.5">
+                        <span class="text-[10px] text-zinc-400 font-semibold">القوائم الحالية المتاحة:</span>
+                        <div id="adminCategoriesList" class="space-y-1.5 max-h-36 overflow-y-auto"></div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-zinc-950/90 backdrop-blur-md border-t border-zinc-800/80 px-6 py-2.5 flex justify-between items-center z-40 text-xs">
+        <button onclick="handleStoreTabClick()" id="nav-store" class="flex flex-col items-center gap-1 text-cyan-400 transition-colors">
+            <i class="fa-solid fa-store text-base"></i>
+            <span class="text-[10px] font-bold">المتجر</span>
+        </button>
+        <button onclick="switchTab('downloads')" id="nav-downloads" class="flex flex-col items-center gap-1 text-zinc-500 hover:text-zinc-300 transition-colors relative">
+            <i class="fa-solid fa-download text-base"></i>
+            <span class="text-[10px] font-bold">التنزيلات</span>
+            <span id="downloadsBadge" class="absolute -top-1 -right-2 bg-cyan-500 text-zinc-950 text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
+        </button>
+        <button onclick="switchTab('favorites')" id="nav-favorites" class="flex flex-col items-center gap-1 text-zinc-500 hover:text-zinc-300 transition-colors relative">
+            <i class="fa-solid fa-heart text-base"></i>
+            <span class="text-[10px] font-bold">المفضلة</span>
+            <span id="favoritesBadge" class="absolute -top-1 -right-2 bg-rose-500 text-zinc-950 text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
+        </button>
+    </nav>
+
+    <!-- App Details Modal -->
+    <div id="appModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-zinc-900 border border-zinc-800 w-full max-w-md rounded-t-3xl sm:rounded-3xl max-h-[85vh] overflow-y-auto p-5 space-y-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div id="modalIconContainer" class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-md overflow-hidden">
+                        <i id="modalIconClass" class="fa-solid fa-cube text-zinc-950 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 id="modalTitle" class="text-sm font-black text-zinc-100">اسم التطبيق</h3>
+                        <p id="modalCategory" class="text-[10px] text-cyan-400 font-bold">أدوات ذكية</p>
+                    </div>
+                </div>
+                <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-zinc-800 text-zinc-400 hover:text-zinc-200 flex items-center justify-center text-xs">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-4 gap-1.5 bg-zinc-950/50 p-2.5 rounded-2xl text-center border border-zinc-800/60 text-[10px]">
+                <div>
+                    <span class="block text-zinc-500">التقييم</span>
+                    <span id="modalRating" class="font-black text-amber-400">★ 5.0</span>
+                </div>
+                <div class="border-x border-zinc-800">
+                    <span class="block text-zinc-500">الحجم</span>
+                    <span id="modalSize" class="font-black text-zinc-200">15 MB</span>
+                </div>
+                <div class="border-l border-zinc-800">
+                    <span class="block text-zinc-500">الإصدار</span>
+                    <span id="modalVersion" class="font-black text-cyan-400">1.0.0</span>
+                </div>
+                <div>
+                    <span class="block text-zinc-500">الأندرويد</span>
+                    <span id="modalMinAndroid" class="font-black text-zinc-300">8.0+</span>
+                </div>
+            </div>
+
+            <div class="bg-zinc-950/30 p-2.5 rounded-xl border border-zinc-800/50 flex items-center justify-between text-[11px]">
+                <span class="text-zinc-400">معرف الحزمة (Package):</span>
+                <span id="modalPackage" class="font-mono text-cyan-400 text-[10px]">com.nexus.app</span>
+            </div>
+
+            <div id="modalScreenshotsSection" class="space-y-1.5 hidden">
+                <span class="text-[11px] font-bold text-zinc-400">صور من داخل التطبيق</span>
+                <div id="modalScreenshotsContainer" class="flex gap-2 overflow-x-auto pb-2"></div>
+            </div>
+
+            <div class="space-y-1">
+                <span class="text-[11px] font-bold text-zinc-400">حول هذا التطبيق</span>
+                <p id="modalDesc" class="text-xs text-zinc-300 leading-relaxed bg-zinc-950/40 p-3 rounded-xl border border-zinc-800/50"></p>
+            </div>
+
+            <div class="space-y-2 border-t border-zinc-800 pt-3">
+                <span class="text-[11px] font-bold text-zinc-400">تقييمات المستخدمين ومراجعاتهم</span>
+                <div id="modalReviewsList" class="space-y-2 max-h-32 overflow-y-auto"></div>
+                <div class="flex gap-2 pt-1">
+                    <input type="text" id="newReviewInput" placeholder="اكتب تقييماً أو رأيك..." class="flex-1 bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-cyan-500">
+                    <button onclick="addReview()" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 px-3 py-2 rounded-xl text-xs font-bold">إرسال</button>
+                </div>
+            </div>
+
+            <div class="flex gap-2 pt-2">
+                <button onclick="toggleFavoriteCurrent()" id="favBtn" class="w-12 h-12 rounded-xl bg-zinc-800 text-zinc-400 flex items-center justify-center text-base hover:bg-zinc-700 transition-colors">
+                    <i class="fa-regular fa-heart"></i>
+                </button>
+                <button onclick="shareAppAPK()" class="w-12 h-12 rounded-xl bg-zinc-800 text-zinc-400 flex items-center justify-center text-base hover:bg-zinc-700 transition-colors" title="مشاركة التطبيق">
+                    <i class="fa-solid fa-share-nodes"></i>
+                </button>
+                <button onclick="startRealDownload()" id="installBtn" class="flex-1 bg-cyan-500 hover:bg-cyan-400 text-zinc-950 font-extrabold text-xs py-3 rounded-xl transition-all shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-download"></i> تنزيل ملف APK الحقيقي
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-16 left-1/2 -translate-x-1/2 bg-zinc-900 border border-zinc-700 text-zinc-100 px-4 py-2.5 rounded-2xl shadow-xl text-xs font-bold transition-all duration-300 opacity-0 pointer-events-none z-50 flex items-center gap-2">
+        <i class="fa-solid fa-circle-check text-cyan-400"></i>
+        <span id="toastText">تم بنجاح!</span>
+    </div>
+
+    <script>
+        let categories = JSON.parse(localStorage.getItem('nexus_categories')) || [
+            { id: 'all', name: 'الكل' },
+            { id: 'tools', name: 'أدوات ذكية' },
+            { id: 'security', name: 'أمان وحماية' },
+            { id: 'entertainment', name: 'ترفيه وألعاب' }
+        ];
+
+        let apps = JSON.parse(localStorage.getItem('nexus_apps')) || [
+            {
+                id: '1',
+                title: 'Nexus Optimizer',
+                category: 'tools',
+                catName: 'أدوات ذكية',
+                rating: '4.9',
+                downloads: '10K+',
+                size: '14.2 MB',
+                version: '2.1.0',
+                minAndroid: 'Android 7.0+',
+                packageName: 'com.nexus.optimizer',
+                desc: 'أداة ذكية متكاملة لتنظيف الذاكرة المؤقتة وتسريع أداء نظام التشغيل بكفاءة عالية.',
+                iconClass: 'fa-gauge-high',
+                bgGradient: 'from-cyan-500 to-indigo-600',
+                image: null,
+                appFileUrl: null,
+                screenshots: [],
+                reviews: [{ user: 'أحمد', comment: 'تطبيق رائع جداً وأنصح بتنزيله!' }]
+            },
+            {
+                id: '2',
+                title: 'SecureGuard Pro',
+                category: 'security',
+                catName: 'أمان وحماية',
+                rating: '4.8',
+                downloads: '5K+',
+                size: '22.5 MB',
+                version: '1.4.2',
+                minAndroid: 'Android 9.0+',
+                packageName: 'com.nexus.secureguard',
+                desc: 'تطبيق لحماية الخصوصية وتشفير الملفات ومنع التتبع المجهول على الأجهزة الذكية.',
+                iconClass: 'fa-shield-halved',
+                bgGradient: 'from-emerald-500 to-teal-600',
+                image: null,
+                appFileUrl: null,
+                screenshots: [],
+                reviews: [{ user: 'محمد', comment: 'حماية ممتازة وخفيف على الجهاز.' }]
+            }
+        ];
+
+        let downloadedApps = JSON.parse(localStorage.getItem('nexus_downloaded')) || [];
+        let favorites = JSON.parse(localStorage.getItem('nexus_favorites')) || [];
+        let storeDesignSettings = JSON.parse(localStorage.getItem('nexus_design')) || { title: 'Nexus Apps', cardRadius: 'rounded-2xl' };
+        
+        let currentSelectedApp = null;
+        let currentCategoryFilter = 'all';
+
+        let storeClickCount = 0;
+        let storeClickTimer = null;
+
+        function handleStoreTabClick() {
+            storeClickCount++;
+            clearTimeout(storeClickTimer);
+            storeClickTimer = setTimeout(() => { storeClickCount = 0; }, 1500);
+
+            if (storeClickCount === 3) {
+                storeClickCount = 0;
+                clearTimeout(storeClickTimer);
+                switchTab('admin-design');
+                checkAdmin2AuthStatus();
+                return;
+            }
+
+            switchTab('store');
+        }
+
+        let logoClickCount = 0;
+        let logoClickTimer = null;
+
+        function handleLogoClick() {
+            logoClickCount++;
+            clearTimeout(logoClickTimer);
+            logoClickTimer = setTimeout(() => { logoClickCount = 0; }, 2000);
+
+            if (logoClickCount === 4) {
+                logoClickCount = 0;
+                clearTimeout(logoClickTimer);
+                const password = prompt("🔒 أدخل كلمة سر لوحة التحكم الأولى:");
+                if (password === 'ayay@@22') {
+                    switchTab('admin');
+                    renderAdminCategorySelect();
+                    showToast("🔓 تم فتح لوحة التحكم بنجاح");
+                } else if (password !== null) {
+                    alert("❌ كلمة السر غير صحيحة!");
+                }
+            }
+        }
+
+        function verifyAdmin2Password() {
+            const pwdInput = document.getElementById('admin2PasswordInput').value.trim();
+            if(pwdInput === 'ayay@@22') {
+                sessionStorage.setItem('nexus_admin2_auth', 'true');
+                checkAdmin2AuthStatus();
+                showToast("🔓 تم فتح لوحة تحكم التصميم والقوائم بنجاح");
+            } else {
+                alert("❌ كلمة المرور غير صحيحة! كلمة المرور المطلوبة هي: ayay@@22");
+                document.getElementById('admin2PasswordInput').value = '';
+            }
+        }
+
+        function checkAdmin2AuthStatus() {
+            const isAuthed = sessionStorage.getItem('nexus_admin2_auth') === 'true';
+            const loginBox = document.getElementById('admin2LoginBox');
+            const contentBox = document.getElementById('admin2ContentBox');
+
+            if(isAuthed) {
+                loginBox.classList.add('hidden');
+                contentBox.classList.remove('hidden');
+                renderAdminCategories();
+            } else {
+                loginBox.classList.remove('hidden');
+                contentBox.classList.add('hidden');
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('nexus_apps', JSON.stringify(apps));
+            localStorage.setItem('nexus_downloaded', JSON.stringify(downloadedApps));
+            localStorage.setItem('nexus_favorites', JSON.stringify(favorites));
+            localStorage.setItem('nexus_categories', JSON.stringify(categories));
+            localStorage.setItem('nexus_design', JSON.stringify(storeDesignSettings));
+            updateBadges();
+        }
+
+        function applyStoreDesign() {
+            document.getElementById('storeTitleText').innerText = storeDesignSettings.title;
+            document.title = storeDesignSettings.title + " - المتجر الذكي";
+        }
+
+        function switchTab(tabName) {
+            ['store', 'downloads', 'updates', 'favorites', 'admin', 'admin-design'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+            });
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+
+            ['store', 'downloads', 'favorites'].forEach(t => {
+                const el = document.getElementById(`nav-${t}`);
+                if(el) {
+                    el.className = t === tabName ? 'flex flex-col items-center gap-1 text-cyan-400 transition-colors' : 'flex flex-col items-center gap-1 text-zinc-500 hover:text-zinc-300 transition-colors relative';
+                }
+            });
+
+            if(tabName === 'store') {
+                renderCategoriesBar();
+                renderApps(apps);
+            }
+            if(tabName === 'downloads') renderDownloads();
+            if(tabName === 'favorites') renderFavorites();
+            if(tabName === 'updates') renderUpdatesList();
+            if(tabName === 'admin') renderAdminCategorySelect();
+            if(tabName === 'admin-design') checkAdmin2AuthStatus();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderCategoriesBar() {
+            const bar = document.getElementById('categoriesFilterBar');
+            bar.innerHTML = '';
+            categories.forEach(cat => {
+                const btn = document.createElement('button');
+                const isActive = currentCategoryFilter === cat.id;
+                btn.className = isActive ? "cat-btn px-4 py-2 rounded-xl bg-cyan-500 text-zinc-950 font-bold whitespace-nowrap transition-all shadow-sm" : "cat-btn px-4 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 font-semibold whitespace-nowrap transition-all hover:bg-zinc-800";
+                btn.innerText = cat.name;
+                btn.onclick = () => filterCategory(cat.id, btn);
+                bar.appendChild(btn);
+            });
+        }
+
+        function renderAdminCategorySelect() {
+            const select = document.getElementById('newAppCategory');
+            select.innerHTML = '';
+            categories.filter(c => c.id !== 'all').forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat.id;
+                opt.innerText = cat.name;
+                select.appendChild(opt);
+            });
+        }
+
+        function renderAdminCategories() {
+            const list = document.getElementById('adminCategoriesList');
+            list.innerHTML = '';
+            categories.forEach(cat => {
+                const div = document.createElement('div');
+                div.className = "bg-zinc-900 border border-zinc-800 p-2.5 rounded-xl flex items-center justify-between text-xs";
+                div.innerHTML = `
+                    <div>
+                        <span class="font-bold text-zinc-200">${cat.name}</span>
+                        <span class="text-[10px] text-zinc-500 font-mono mr-2">(${cat.id})</span>
+                    </div>
+                    ${cat.id !== 'all' ? `<button onclick="deleteCategory('${cat.id}')" class="text-rose-400 hover:text-rose-300 px-2 py-1"><i class="fa-solid fa-trash-can"></i></button>` : ''}
+                `;
+                list.appendChild(div);
+            });
+            document.getElementById('designStoreTitle').value = storeDesignSettings.title;
+            document.getElementById('designBorderRadius').value = storeDesignSettings.cardRadius;
+        }
+
+        function addNewCategory() {
+            const idInput = document.getElementById('newCatId');
+            const nameInput = document.getElementById('newCatName');
+            const id = idInput.value.trim().toLowerCase();
+            const name = nameInput.value.trim();
+
+            if(!id || !name) {
+                alert("⚠️ يرجى تعبئة حقل المعرف (بالإنجليزية) والاسم (بالعربية) للقائمة!");
+                return;
+            }
+            if(categories.some(c => c.id === id)) {
+                alert("⚠️ هذا المعرف موجود مسبقاً!");
+                return;
+            }
+
+            categories.push({ id, name });
+            saveData();
+            idInput.value = '';
+            nameInput.value = '';
+            renderAdminCategories();
+            showToast("✅ تمت إضافة القائمة وتحديث المتجر بنجاح!");
+        }
+
+        function deleteCategory(id) {
+            if(confirm("هل أنت متأكد من حذف هذه القائمة؟")) {
+                categories = categories.filter(c => c.id !== id);
+                saveData();
+                renderAdminCategories();
+                showToast("🗑️ تم حذف القائمة بنجاح");
+            }
+        }
+
+        function saveStoreDesignSettings() {
+            storeDesignSettings.title = document.getElementById('designStoreTitle').value.trim() || 'Nexus Apps';
+            storeDesignSettings.cardRadius = document.getElementById('designBorderRadius').value;
+            saveData();
+            applyStoreDesign();
+            showToast("✨ تم حفظ وتطبيق التصميم الجديد بنجاح!");
+        }
+
+        function renderApps(list) {
+            const container = document.getElementById('appsList');
+            container.innerHTML = '';
+            
+            if(list.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 text-zinc-500 text-xs font-semibold">لا توجد تطبيقات متاحة حالياً في هذه القائمة</div>`;
+                return;
+            }
+
+            list.forEach(app => {
+                let iconContent = `<i class="fa-solid ${app.iconClass || 'fa-cube'} text-zinc-950 text-base"></i>`;
+                if(app.image) {
+                    iconContent = `<img src="${app.image}" class="w-full h-full object-cover">`;
+                }
+
+                const card = document.createElement('div');
+                card.className = `bg-zinc-900/60 border border-zinc-800/80 hover:border-zinc-700/80 p-3 ${storeDesignSettings.cardRadius || 'rounded-2xl'} flex items-center justify-between gap-3 transition-all cursor-pointer group`;
+                card.onclick = () => openModal(app.id);
+                card.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr ${app.bgGradient || 'from-cyan-500 to-indigo-600'} flex items-center justify-center shadow-md flex-shrink-0 overflow-hidden">
+                            ${iconContent}
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-black text-zinc-100 group-hover:text-cyan-400 transition-colors">${app.title}</h4>
+                            <p class="text-[10px] text-zinc-400 mt-0.5 line-clamp-1">${app.desc}</p>
+                            <div class="flex items-center gap-2 mt-1.5">
+                                <span class="bg-zinc-800/80 text-zinc-300 text-[9px] font-bold px-2 py-0.5 rounded-md">${app.catName || 'أدوات'}</span>
+                                <span class="text-[10px] text-amber-400 font-bold">★ ${app.rating}</span>
+                                <span class="text-[10px] text-zinc-500">${app.size}</span>
+                                <span class="text-[9px] text-cyan-400 font-mono">v${app.version || '1.0'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="w-9 h-9 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-xs group-hover:bg-cyan-500 group-hover:text-zinc-950 transition-all">
+                        <i class="fa-solid fa-chevron-left text-[10px]"></i>
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filterCategory(catId, btnElement) {
+            currentCategoryFilter = catId;
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                btn.className = "cat-btn px-4 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 font-semibold whitespace-nowrap transition-all hover:bg-zinc-800";
+            });
+            if(btnElement) {
+                btnElement.className = "cat-btn px-4 py-2 rounded-xl bg-cyan-500 text-zinc-950 font-bold whitespace-nowrap transition-all shadow-sm";
+            }
+
+            if(catId === 'all') {
+                renderApps(apps);
+            } else {
+                const filtered = apps.filter(a => a.category === catId);
+                renderApps(filtered);
+            }
+        }
+
+        function filterApps() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = apps.filter(a => 
+                (currentCategoryFilter === 'all' || a.category === currentCategoryFilter) && 
+                (a.title.toLowerCase().includes(query) || a.desc.toLowerCase().includes(query))
+            );
+            renderApps(filtered);
+        }
+
+        function openModal(id) {
+            currentSelectedApp = apps.find(a => a.id === id);
+            if(!currentSelectedApp) return;
+
+            document.getElementById('modalTitle').innerText = currentSelectedApp.title;
+            document.getElementById('modalCategory').innerText = currentSelectedApp.catName || 'تطبيق ذكي';
+            document.getElementById('modalRating').innerText = `★ ${currentSelectedApp.rating}`;
+            document.getElementById('modalSize').innerText = currentSelectedApp.size;
+            document.getElementById('modalVersion').innerText = `v${currentSelectedApp.version || '1.0.0'}`;
+            document.getElementById('modalMinAndroid').innerText = currentSelectedApp.minAndroid || '8.0+';
+            document.getElementById('modalPackage').innerText = currentSelectedApp.packageName || 'com.nexus.app';
+            document.getElementById('modalDesc').innerText = currentSelectedApp.desc;
+
+            const iconContainer = document.getElementById('modalIconContainer');
+            if(currentSelectedApp.image) {
+                iconContainer.innerHTML = `<img src="${currentSelectedApp.image}" class="w-full h-full object-cover">`;
+            } else {
+                iconContainer.innerHTML = `<i class="fa-solid ${currentSelectedApp.iconClass || 'fa-cube'} text-zinc-950 text-xl"></i>`;
+            }
+
+            const scContainer = document.getElementById('modalScreenshotsContainer');
+            const scSection = document.getElementById('modalScreenshotsSection');
+            scContainer.innerHTML = '';
+            if(currentSelectedApp.screenshots && currentSelectedApp.screenshots.length > 0) {
+                scSection.classList.remove('hidden');
+                currentSelectedApp.screenshots.forEach(sc => {
+                    const img = document.createElement('img');
+                    img.src = sc;
+                    img.className = "w-28 h-20 object-cover rounded-xl border border-zinc-800 flex-shrink-0";
+                    scContainer.appendChild(img);
+                });
+            } else {
+                scSection.classList.add('hidden');
+            }
+
+            renderModalReviews();
+            updateFavBtnUI();
+            
+            const installBtn = document.getElementById('installBtn');
+            if(currentSelectedApp.appFileUrl) {
+                installBtn.innerHTML = `<i class="fa-solid fa-download"></i> تنزيل ملف APK الحقيقي`;
+                installBtn.className = "flex-1 bg-cyan-500 hover:bg-cyan-400 text-zinc-950 font-extrabold text-xs py-3 rounded-xl transition-all shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-2";
+            } else {
+                installBtn.innerHTML = `<i class="fa-solid fa-circle-exclamation text-amber-500"></i> لم يتم إرفاق ملف APK`;
+                installBtn.className = "flex-1 bg-zinc-800 text-zinc-400 font-extrabold text-xs py-3 rounded-xl flex items-center justify-center gap-2 cursor-not-allowed";
+            }
+
+            document.getElementById('appModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('appModal').classList.add('hidden');
+        }
+
+        function renderModalReviews() {
+            const listContainer = document.getElementById('modalReviewsList');
+            listContainer.innerHTML = '';
+            if(!currentSelectedApp.reviews || currentSelectedApp.reviews.length === 0) {
+                listContainer.innerHTML = `<p class="text-[10px] text-zinc-500">لا توجد تقييمات بعد. كن أول من يقيّم!</p>`;
+                return;
+            }
+            currentSelectedApp.reviews.forEach(r => {
+                const div = document.createElement('div');
+                div.className = "bg-zinc-950/40 p-2 rounded-xl border border-zinc-800/40 text-[11px]";
+                div.innerHTML = `<span class="font-bold text-cyan-400">${r.user}:</span> <span class="text-zinc-300">${r.comment}</span>`;
+                listContainer.appendChild(div);
+            });
+        }
+
+        function addReview() {
+            const input = document.getElementById('newReviewInput');
+            const val = input.value.trim();
+            if(!val) return;
+            if(!currentSelectedApp.reviews) currentSelectedApp.reviews = [];
+            currentSelectedApp.reviews.push({ user: 'مستخدم محلي', comment: val });
+            input.value = '';
+            renderModalReviews();
+            saveData();
+            showToast("تمت إضافة تقييمك بنجاح");
+        }
+
+        function startRealDownload() {
+            if(!currentSelectedApp) return;
+            if(!currentSelectedApp.appFileUrl) {
+                alert("⚠️ تنبيه: لم يتم إرفاق ملف APK حقيقي لهذا التطبيق من لوحة التحكم!");
+                return;
+            }
+
+            closeModal();
+            switchTab('downloads');
+
+            const qContainer = document.getElementById('queueContainer');
+            const qId = 'q-' + Date.now();
+            const qCard = document.createElement('div');
+            qCard.id = qId;
+            qCard.className = "bg-zinc-900 border border-cyan-500/30 p-3 rounded-2xl space-y-2";
+            qCard.innerHTML = `
+                <div class="flex justify-between items-center text-xs">
+                    <span class="font-bold text-zinc-100"><i class="fa-solid fa-spinner fa-spin text-cyan-400 ml-1.5"></i> جاري تحميل ${currentSelectedApp.title}...</span>
+                    <span id="${qId}-pct" class="font-mono text-cyan-400 font-bold">0%</span>
+                </div>
+                <div class="w-full bg-zinc-950 h-1.5 rounded-full overflow-hidden">
+                    <div id="${qId}-bar" class="bg-cyan-500 h-full w-0 transition-all duration-300"></div>
+                </div>
+            `;
+            qContainer.prepend(qCard);
+
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.floor(Math.random() * 25) + 10;
+                if(progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        qCard.remove();
+                        triggerBrowserDownload(currentSelectedApp);
+                    }, 500);
+                }
+                document.getElementById(`${qId}-pct`).innerText = progress + '%';
+                document.getElementById(`${qId}-bar`).style.width = progress + '%';
+            }, 300);
+        }
+
+        function triggerBrowserDownload(app) {
+            const a = document.createElement('a');
+            a.href = app.appFileUrl;
+            a.download = app.title.replace(/\s+/g, '_') + '.apk';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            if(!downloadedApps.some(d => d.id === app.id)) {
+                downloadedApps.push(app);
+                saveData();
+                renderDownloads();
+            }
+            showToast("📥 اكتمل تحميل ملف الـ APK وتثبيته محلياً!");
+        }
+
+        function shareAppAPK() {
+            if(!currentSelectedApp) return;
+            const shareText = `تحميل تطبيق ${currentSelectedApp.title} برابط مباشر وآمن عبر متجر ${storeDesignSettings.title}!`;
+            if(navigator.share) {
+                navigator.share({ title: currentSelectedApp.title, text: shareText, url: window.location.href }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                showToast("📋 تم نسخ رابط المشاركة إلى الحافظة!");
+            }
+        }
+
+        function toggleFavoriteCurrent() {
+            if(!currentSelectedApp) return;
+            const idx = favorites.findIndex(f => f.id === currentSelectedApp.id);
+            if(idx > -1) {
+                favorites.splice(idx, 1);
+                showToast("تمت الإزالة من المفضلة");
+            } else {
+                favorites.push(currentSelectedApp);
+                showToast("تمت الإضافة إلى المفضلة");
+            }
+            saveData();
+            updateFavBtnUI();
+        }
+
+        function updateFavBtnUI() {
+            if(!currentSelectedApp) return;
+            const isFav = favorites.some(f => f.id === currentSelectedApp.id);
+            const btn = document.getElementById('favBtn');
+            if(isFav) {
+                btn.innerHTML = `<i class="fa-solid fa-heart text-rose-500"></i>`;
+            } else {
+                btn.innerHTML = `<i class="fa-regular fa-heart"></i>`;
+            }
+        }
+
+        function renderDownloads() {
+            const container = document.getElementById('downloadsList');
+            container.innerHTML = '';
+            if(downloadedApps.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-zinc-500 text-xs font-semibold">لا توجد تطبيقات محملة مؤخراً</div>`;
+                return;
+            }
+            downloadedApps.forEach(app => {
+                const card = document.createElement('div');
+                card.className = `bg-zinc-900/60 border border-zinc-800 p-3 ${storeDesignSettings.cardRadius || 'rounded-2xl'} flex items-center justify-between gap-3`;
+                card.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr ${app.bgGradient || 'from-cyan-500 to-indigo-600'} flex items-center justify-center overflow-hidden">
+                            ${app.image ? `<img src="${app.image}" class="w-full h-full object-cover">` : `<i class="fa-solid ${app.iconClass || 'fa-cube'} text-zinc-950 text-sm"></i>`}
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold text-zinc-100">${app.title}</h4>
+                            <span class="text-[10px] text-emerald-400 font-semibold">جاهز للاستخدام v${app.version || '1.0'}</span>
+                        </div>
+                    </div>
+                    <button onclick="openModal('${app.id}')" class="px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-bold">خيارات</button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderFavorites() {
+            const container = document.getElementById('favoritesList');
+            container.innerHTML = '';
+            if(favorites.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 text-zinc-500 text-xs font-semibold">قائمة المفضلة فارغة</div>`;
+                return;
+            }
+            favorites.forEach(app => {
+                const card = document.createElement('div');
+                card.className = `bg-zinc-900/60 border border-zinc-800 p-3 ${storeDesignSettings.cardRadius || 'rounded-2xl'} flex items-center justify-between gap-3 cursor-pointer`;
+                card.onclick = () => openModal(app.id);
+                card.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr ${app.bgGradient || 'from-cyan-500 to-indigo-600'} flex items-center justify-center overflow-hidden">
+                            ${app.image ? `<img src="${app.image}" class="w-full h-full object-cover">` : `<i class="fa-solid ${app.iconClass || 'fa-cube'} text-zinc-950 text-sm"></i>`}
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold text-zinc-100">${app.title}</h4>
+                            <span class="text-[10px] text-zinc-400">${app.catName || 'أدوات'}</span>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-heart text-rose-500 text-xs"></i>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function scanForUpdates() {
+            showToast("🔍 جاري فحص الحزم والتحديثات...");
+            setTimeout(() => {
+                renderUpdatesList();
+                showToast("✅ النظام محدث بالكامل!");
+            }, 1200);
+        }
+
+        function renderUpdatesList() {
+            const container = document.getElementById('updatesList');
+            container.innerHTML = '';
+            if(downloadedApps.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-zinc-500 text-xs">لا توجد تطبيقات مثبتة لفحص تحديثاتها.</div>`;
+                document.getElementById('updatesBadge').classList.add('hidden');
+                return;
+            }
+            downloadedApps.forEach(app => {
+                const div = document.createElement('div');
+                div.className = "bg-zinc-900 border border-zinc-800 p-3 rounded-2xl flex items-center justify-between text-xs";
+                div.innerHTML = `
+                    <div>
+                        <span class="font-bold text-zinc-200 block">${app.title}</span>
+                        <span class="text-[10px] text-zinc-400">الإصدار الحالي: v${app.version || '1.0.0'} (أحدث إصدار متوفر)</span>
+                    </div>
+                    <span class="bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-lg text-[10px] font-bold">محدث</span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function updateBadges() {
+            const dlBadge = document.getElementById('downloadsBadge');
+            if(downloadedApps.length > 0) {
+                dlBadge.innerText = downloadedApps.length;
+                dlBadge.classList.remove('hidden');
+            } else {
+                dlBadge.classList.add('hidden');
+            }
+
+            const favBadge = document.getElementById('favoritesBadge');
+            if(favorites.length > 0) {
+                favBadge.innerText = favorites.length;
+                favBadge.classList.remove('hidden');
+            } else {
+                favBadge.classList.add('hidden');
+            }
+        }
+
+        function handleAddNewApp(e) {
+            e.preventDefault();
+            const name = document.getElementById('newAppName').value;
+            const category = document.getElementById('newAppCategory').value;
+            const version = document.getElementById('newAppVersion').value;
+            const size = document.getElementById('newAppSize').value;
+            const minAndroid = document.getElementById('newAppMinAndroid').value;
+            const packageName = document.getElementById('newAppPackage').value;
+            const desc = document.getElementById('newAppDesc').value;
+            const imageInput = document.getElementById('newAppImage');
+            const appFileInput = document.getElementById('newAppFile');
+            const screenshotsInput = document.getElementById('newAppScreenshots');
+
+            const foundCat = categories.find(c => c.id === category);
+            let catName = foundCat ? foundCat.name : "أدوات ذكية";
+            let bgGradient = "from-cyan-500 to-indigo-600";
+            let iconClass = "fa-cube";
+
+            if(category === 'security') {
+                bgGradient = "from-emerald-500 to-teal-600";
+                iconClass = "fa-shield-halved";
+            } else if(category === 'entertainment') {
+                bgGradient = "from-pink-500 to-rose-600";
+                iconClass = "fa-gamepad";
+            }
+
+            let iconResult = null;
+            let appFileResult = null;
+            let screenshotsResults = [];
+
+            const createFinalApp = () => {
+                const newApp = {
+                    id: Date.now().toString(),
+                    title: name,
+                    category: category,
+                    catName: catName,
+                    rating: '5.0',
+                    downloads: '1+',
+                    size: size,
+                    version: version,
+                    minAndroid: minAndroid,
+                    packageName: packageName,
+                    desc: desc,
+                    iconClass: iconClass,
+                    bgGradient: bgGradient,
+                    image: iconResult,
+                    appFileUrl: appFileResult,
+                    screenshots: screenshotsResults,
+                    reviews: []
+                };
+
+                apps.unshift(newApp);
+                saveData();
+                renderApps(apps);
+                document.getElementById('addAppForm').reset();
+                switchTab('store');
+                showToast("🚀 تم نشر التطبيق وتضمين ملف الـ APK بنجاح!");
+            };
+
+            if(imageInput.files && imageInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    iconResult = e.target.result;
+                    processAppFile();
+                };
+                reader.readAsDataURL(imageInput.files[0]);
+            } else {
+                processAppFile();
+            }
+
+            function processAppFile() {
+                if(appFileInput.files && appFileInput.files[0]) {
+                    const fReader = new FileReader();
+                    fReader.onload = function(e) {
+                        appFileResult = e.target.result;
+                        processScreenshots();
+                    };
+                    fReader.readAsDataURL(appFileInput.files[0]);
+                } else {
+                    processScreenshots();
+                }
+            }
+
+            function processScreenshots() {
+                if(screenshotsInput.files && screenshotsInput.files.length > 0) {
+                    let filesArray = Array.from(screenshotsInput.files);
+                    let loadedCount = 0;
+                    filesArray.forEach(file => {
+                        const sReader = new FileReader();
+                        sReader.onload = function(e) {
+                            screenshotsResults.push(e.target.result);
+                            loadedCount++;
+                            if(loadedCount === filesArray.length) {
+                                createFinalApp();
+                            }
+                        };
+                        sReader.readAsDataURL(file);
+                    });
+                } else {
+                    createFinalApp();
+                }
+            }
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastText').innerText = msg;
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            toast.classList.add('opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 2500);
+        }
+
+        window.onload = () => {
+            applyStoreDesign();
+            renderCategoriesBar();
+            renderApps(apps);
+            updateBadges();
+        };
+    </script>
+</body>
+</html>
